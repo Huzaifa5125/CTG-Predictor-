@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetal Health Predictor</title>
+    <style>
+        body {
+            background-image: url('download.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Slight transparency */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/about">About Data</a>
+        <a href="/contact">Contact</a>
+    </div>
+
+    <div class="form-container">
+        <h1>Fetal Health Predictor</h1>
+        <form id="predict-form">
+            <label for="prolongued_decelerations">Prolongued Decelerations:</label>
+            <span class="range-info">(Enter value between 0.0 and 0.005)</span>
+            <input type="number" id="prolongued_decelerations" name="prolongued_decelerations" step="any" min="0.0" max="0.005" required>
+
+            <label for="abnormal_short_term_variability">Abnormal Short-Term Variability:</label>
+            <span class="range-info">(Enter value between 12.0 and 87.0)</span>
+            <input type="number" id="abnormal_short_term_variability" name="abnormal_short_term_variability" step="any" min="12.0" max="87.0" required>
+
+            <label for="percentage_of_time_with_abnormal_long_term_variability">Percentage of Time with Abnormal Long-Term Variability:</label>
+            <span class="range-info">(Enter value between 0.0 and 91.0)</span>
+            <input type="number" id="percentage_of_time_with_abnormal_long_term_variability" name="percentage_of_time_with_abnormal_long_term_variability" step="any" min="0.0" max="91.0" required>
+
+            <label for="accelerations">Accelerations:</label>
+            <span class="range-info">(Enter value between 0.0 and 0.019)</span>
+            <input type="number" id="accelerations" name="accelerations" step="any" min="0.0" max="0.019" required>
+
+            <label for="histogram_mode">Histogram Mode:</label>
+            <span class="range-info">(Enter value between 60.0 and 187.0)</span>
+            <input type="number" id="histogram_mode" name="histogram_mode" step="any" min="60.0" max="187.0" required>
+
+            <label for="histogram_mean">Histogram Mean:</label>
+            <span class="range-info">(Enter value between 73.0 and 182.0)</span>
+            <input type="number" id="histogram_mean" name="histogram_mean" step="any" min="73.0" max="182.0" required>
+
+            <label for="mean_value_of_long_term_variability">Mean Value of Long-Term Variability:</label>
+            <span class="range-info">(Enter value between 0.0 and 50.7)</span>
+            <input type="number" id="mean_value_of_long_term_variability" name="mean_value_of_long_term_variability" step="any" min="0.0" max="50.7" required>
+
+            <label for="histogram_variance">Histogram Variance:</label>
+            <span class="range-info">(Enter value between 0.0 and 269.0)</span>
+            <input type="number" id="histogram_variance" name="histogram_variance" step="any" min="0.0" max="269.0" required>
+
+            <label for="histogram_median">Histogram Median:</label>
+            <span class="range-info">(Enter value between 77.0 and 186.0)</span>
+            <input type="number" id="histogram_median" name="histogram_median" step="any" min="77.0" max="186.0" required>
+
+            <label for="uterine_contractions">Uterine Contractions:</label>
+            <span class="range-info">(Enter value between 0.0 and 0.015)</span>
+            <input type="number" id="uterine_contractions" name="uterine_contractions" step="any" min="0.0" max="0.015" required>
+
+            <button type="submit">Predict</button>
+        </form>
+        <div id="result" class="result">
+            <!-- Result will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predict-form').onsubmit = function (event) {
+            event.preventDefault();
+    
+            var formData = new FormData(this);
+    
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let message;
+                    if (data.fetal_health == 1) {
+                        message = "Your fetal health is normal.";
+                    } else if (data.fetal_health == 2) {
+                        message = "Suspect of danger in fetal health. Please consult a doctor.";
+                    } else if (data.fetal_health == 3) {
+                        message = "Pathologic condition detected. Immediate medical attention is required.";
+                    }
+    
+                    document.getElementById('result').innerHTML = `
+                        <h2>Prediction Result</h2>
+                        <p>Fetal Health: <strong>${data.fetal_health}</strong></p>
+                        <p>${message}</p>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `
+                        <p>Error: ${error}</p>
+                    `;
+                });
+        };
+    </script>
+    
+</body>
+</html>
